@@ -36,6 +36,13 @@
         {
             background-color: #808080;
             margin: 0 300px 6em 0;
+            overflow: hidden;
+        }
+
+        #board img
+        {
+            max-height: 100%;
+            max-width: 100%;
         }
         
         #areas
@@ -54,16 +61,19 @@
             width: 100%;
             background-color: #4cff00;
         }
-        
-        
-        
-        
+
+        #images li img
+        {
+            max-width: 120px;
+            max-height: 90px;
+        }
     </style>
 </head>
 <body>
     <div id="ui">
         <div id="images">    
             <ul>
+                <li><img src="Samples/IMG_3104.JPG" /></li>
                 <li>
                 <img id="image" src="apple-touch-icon-57x57-precomposed.png" />
                 </li>
@@ -75,12 +85,25 @@
                 </li>
             </ul>
         </div>
-        <div id="areas">b</div>
-        <div id="board">c</div>
+        <div id="areas">
+            <div>
+                <h2>Area 1</h2>
+                <ul>
+                    <li>Point 1</li>
+                    <li>Point 1</li>
+                </ul>
+            </div>
+
+        </div>
+        <div id="board">
+            <canvas id="canvas"></canvas>
+            <img src="Samples/IMG_3104.JPG" />
+        </div>
         
     </div>
 
-    <div id="toolbar">d</div>
+    <div id="toolbar">
+    </div>
 
     <script src="Scripts/jquery-1.6.4.js" type="text/javascript"></script>
 	<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
@@ -129,6 +152,84 @@
             }
         }
         document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+        $(function () {
+
+            var canvas = $('#canvas').get(0);
+            var ctx = canvas.getContext('2d');
+            var w = h = canvas.width = canvas.height = 300;
+            
+            var points = new Array();
+
+            canvas.addEventListener('mousemove', function (e) {
+                
+                canvas.width = canvas.width;
+
+                var point = {
+                    x: e.pageX - canvas.offsetLeft,
+                    y: e.pageY - canvas.offsetTop
+                }
+
+                var str = 'Click to add new point.';
+
+                ctx.fillStyle = '#3f3f3f';
+                ctx.fillRect(point.x + 10, point.y + 10, 70, 20);
+                ctx.fillStyle = '#fff';
+                ctx.font = '18px calibri';
+                ctx.fillText(str, point.x + 10, point.y + 25, 60);
+
+                for (i = 0, f; f = points.length; i++) {
+                    /*if ((point.x == points[i].x) && (point.y == points[i].y)) {
+                        str = 'Click to move current point.';
+
+                        ctx.fillStyle = '#3f3f3f';
+                        ctx.fillRect(point.x + 10, point.y + 10, 70, 20);
+                        ctx.fillStyle = '#fff';
+                        ctx.font = 'bold 20px verdana';
+                        ctx.fillText(str, point.x + 10, point.y + 25, 60);
+                    }*/
+                        str = 'Point: ' + i;
+
+                        ctx.fillStyle = '#3f3f3f';
+                        ctx.fillRect(points[i].x + 10, points[i].y + 10, 70, 20);
+                        ctx.fillStyle = '#fff';
+                        ctx.font = '18px verdana';
+                        ctx.fillText(str, points[i].x + 10, points[i].y + 25, 60);
+                }
+
+                if ((point.x == points[0].x) && (point.y == points[0].y)) {
+                    str = 'Click to close area.';
+
+                    ctx.fillStyle = '#3f3f3f';
+                    ctx.fillRect(point.x + 10, point.y + 10, 70, 20);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '18px calibri';
+                    ctx.fillText(str, point.x + 10, point.y + 25, 60);
+                }
+
+            }, 0);
+
+            canvas.addEventListener('mousedown', function (e) {
+                
+                canvas.width = canvas.width;
+
+                var point = {
+                    x: e.pageX - canvas.offsetLeft,
+                    y: e.pageY - canvas.offsetTop
+                }
+
+                var arrayLength = points.push(point);
+
+                var str = 'New point added.';
+                ctx.fillStyle = '#3f3f3f';
+                ctx.fillRect(point.x + 10, point.y + 10, 70, 20);
+                ctx.fillStyle = '#fff';
+                ctx.font = '18px calibri';
+                ctx.fillText(str, point.x + 10, point.y + 25, 60);
+            }, 0);
+
+        });
+
 </script>
 
 </body>
