@@ -46,21 +46,27 @@
             height: 100px;
         }
 
-            #images li
-            {
-                float: left;
-            }
+        #images li
+        {
+            float: left;
+        }
               
-        #board
+        #boardWrapper
         {
             top: 100px;
             left: 0;
             bottom: 90px;
             right: 250px;
             overflow: auto;
-            position: relative;
         }
 
+        #board
+        {
+            height: 100%;
+            width: 100%;
+            position: fixed;
+        }
+        
         #board img
         {
             position: absolute;
@@ -95,21 +101,21 @@
             max-width: 120px;
             max-height: 90px;
         }
+
+        #fileOpenDialog
+        {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div id="ui">
         <div id="images">    
-            <input type="file" id="fileOpenDialog" name="files[]" multiple />
+            <div class=""><input type="file" id="fileOpenDialog" name="files[]" multiple /></div>
             <ul>
                 <li>
-                <img id="image" src="apple-touch-icon-57x57-precomposed.png" />
-                </li>
-                <li>
-                
-                </li>
-                <li>
-                <output id="list"></output>
+                    <img id="image" src="Images/folder32.png" />
+                    <p>Open a new image</p>
                 </li>
                 <li><img src="Samples/IMG_3104.JPG" /></li>
             </ul>
@@ -125,9 +131,11 @@
 
         </div>
 
-        <div id="board">
-            <img src="Samples/IMG_3104.JPG" />
-            <canvas id="canvas"></canvas>
+        <div id="boardWrapper">
+            <div id="board">
+                <img src="Samples/IMG_3104.JPG" />
+                <canvas id="canvas"></canvas>
+            </div>
         </div>
 
         
@@ -147,19 +155,14 @@
 
     <script>
         $("#image").click(function () {
-            $("#files").click();
+            $("#fileOpenDialog").click();
         });
 
         var images = new Array();
 
         function addImageToList(image) {
-            // Render thumbnail.
-            /*var span = document.createElement('span');
-            span.innerHTML = ['<img class="thumb" src="', image.data,
-                            '" title="', image.filename, '"/>'].join('');*/
-
-            // This line is what replaces the image with the new image
-            $("#image").attr("src", image.data);
+            $('<li><img src="' + image.data + '" title="' + image.filename + '" /><p>' + image.filename + '<p/></li>')
+                .appendTo("#images ul");
         }
 
 
@@ -198,6 +201,7 @@
         $(function () {
 
             var canvas = $('#canvas').get(0);
+            var offset = $('#canvas').offset();
             var ctx = canvas.getContext('2d');
             var w = h = canvas.width = canvas.height = 300;
 
@@ -214,10 +218,10 @@
                 canvas.width = canvas.width;
 
                 closeArea = false;
-
+                
                 var point = {
-                    x: e.pageX - canvas.offsetLeft,
-                    y: e.pageY - canvas.offsetTop
+                    x: e.pageX - offset.left,
+                    y: e.pageY - offset.top
                 }
 
                 var str = 'Click to add new point.';
@@ -256,7 +260,7 @@
                     }
                 }
 
-                if ((point.x == points[0].x) && (point.y == points[0].y)) {
+                /*if ((point.x == points[0].x) && (point.y == points[0].y)) {
 
                     str = 'Click to close area.';
                     closeArea = true;
@@ -265,7 +269,7 @@
                     ctx.fillStyle = '#fff';
                     ctx.font = '18px calibri';
                     ctx.fillText(str, point.x, point.y);
-                }
+                }*/
                 
 
             }, 0);
