@@ -126,7 +126,7 @@
         </div>
 
         <div id="board">
-            <img src="Samples/IMG_3104.JPG" />
+            <!--<img src="Samples/IMG_3104.JPG" />-->
             <canvas id="canvas"></canvas>
         </div>
 
@@ -201,7 +201,6 @@
             var ctx = canvas.getContext('2d');
             var w = h = canvas.width = canvas.height = 300;
 
-
             var closeArea = false;
             
             var points = new Array();
@@ -222,7 +221,6 @@
 
                 var str = 'Click to add new point.';
 
-
                 ctx.fillText(str, point.x, point.y);
 
                 for (i = 0; i<points.length; i++) {
@@ -236,23 +234,18 @@
                         ctx.beginPath();
                         ctx.moveTo(points[i].x, points[i].y);
                     }
-                    
-                    
 
-                    ctx.fillStyle = '#3f3f3';
-                    //  ctx.fillRect(points[i].x, points[i].y, 0, 0);
+                    ctx.fillStyle = '#3f3f3f';
                     ctx.fillRect(points[i].x, points[i].y, 5, 5);
-                    ctx.fillStyle = '#fff';
 
                     if ((point.x == points[i].x) && (point.y == points[i].y)) {
                         str = 'Click to move current point.';
                         movePoint = true;
                         currentPoint = point;
                         ctx.fillStyle = '#3f3f3f';
-                        ctx.fillRect(point.x + 10, point.y + 10, 70, 20);
-                        ctx.fillStyle = '#fff';
-                        ctx.font = 'bold 20px verdana';
-                        ctx.fillText(str, point.x, point.y, 60);
+                        ctx.fillRect(point.x, point.y, 0, 0);
+                        ctx.font = '18px calibri';
+                        ctx.fillText(str, point.x, point.y);
                     }
                 }
 
@@ -262,7 +255,6 @@
                     closeArea = true;
                     ctx.fillStyle = '#3f3f3f';
                     ctx.fillRect(point.x, point.y, 0, 0);
-                    ctx.fillStyle = '#fff';
                     ctx.font = '18px calibri';
                     ctx.fillText(str, point.x, point.y);
                 }
@@ -300,7 +292,6 @@
                         var str = 'New point added.';
                         ctx.fillStyle = '#3f3f3f';
                         ctx.fillRect(point.x, point.y, 0, 0);
-                        ctx.fillStyle = '#fff';
                         ctx.font = '18px calibri';
                         ctx.fillText(str, point.x, point.y);
                     }
@@ -310,13 +301,12 @@
                         var str = 'New point added.';
                         ctx.fillStyle = '#3f3f3f';
                         ctx.fillRect(point.x, point.y, 0, 0);
-                        ctx.fillStyle = '#fff';
                         ctx.font = '18px calibri';
                         ctx.fillText(str, point.x, point.y);
                     }
                 }
 
-                ctx.fill();
+                ctx.stroke();
                 }, 0);
 
 
