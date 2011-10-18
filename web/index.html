@@ -121,7 +121,7 @@
 
         <div id="board">
             <canvas id="canvas"></canvas>
-            <img src="Samples/IMG_3104.JPG" />
+            <!--<img src="Samples/IMG_3104.JPG" />-->
         </div>
 
         
@@ -203,7 +203,7 @@
                 ctx.font = '18px calibri';
                 ctx.fillText(str, point.x + 10, point.y + 25, 60);
 
-                for (i = 0, f; f = points.length; i++) {
+                for (i = 0; i<points.length; i++) {
                     /*if ((point.x == points[i].x) && (point.y == points[i].y)) {
                         str = 'Click to move current point.';
 
