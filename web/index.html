@@ -22,44 +22,67 @@
 
 
     <style>
-        #ui
+        body
         {
-
+            background-color: #dedede;
+        }
+    
+        #ui > div
+        {
+            position: fixed;
         }
 
+        ul
+        {
+            list-style: none;
+        }
+        
         #images
         {
-            background-color: red;
+            background: url(Images/shadow-top.png) #6b6b6b repeat-x bottom;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
         }
-                       
+              
         #board
         {
-            background-color: #808080;
-            margin: 0 300px 6em 0;
-            overflow: hidden;
+            top: 100px;
+            left: 0;
+            bottom: 90px;
+            right: 250px;
+            overflow: auto;
+            position: relative;
         }
 
         #board img
         {
-            max-height: 100%;
-            max-width: 100%;
+            position: absolute;
+        }
+        
+        #board canvas
+        {
+            position: absolute;
         }
         
         #areas
         {
             background-color: #ffd800;
-            float: right;
-            width: 290px;
-            margin: 0 0 6em 0;
+            width: 250px;
+            top: 100px;
+            bottom: 900px;
+            right: 0;            
         }
                         
         #toolbar
         {
             position: fixed;
             bottom: 0;
-            height: 5em;
-            width: 100%;
-            background-color: #4cff00;
+            left: 0;
+            right: 0;
+            height: 90px;
+            background: url(Images/shadow-bottom.png) #6b6b6b repeat-x top;
         }
 
         #images li img
@@ -86,14 +109,16 @@
             </div>
 
         </div>
+
         <div id="board">
             <img src="Samples/IMG_3104.JPG" />
             <canvas></canvas>
         </div>
-        
-    </div>
 
-    <div id="toolbar">
+        
+
+        <div id="toolbar">
+        </div>
     </div>
 
 
