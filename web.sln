@@ -19,7 +19,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "web", "http://localhost:463
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.VirtualPath = "/localhost_4632"
 		SlnRelativePath = "web\"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.2"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
 		UseIISExpress = "true"
 	EndProjectSection
 EndProject
