@@ -183,12 +183,20 @@
             var canvas = $('#canvas').get(0);
             var ctx = canvas.getContext('2d');
             var w = h = canvas.width = canvas.height = 300;
+
+
+            var closeArea = false;
             
             var points = new Array();
+            var areas = new Array();
+            var currentPoint = false;
+            var movePoint = false;
 
             canvas.addEventListener('mousemove', function (e) {
                 
                 canvas.width = canvas.width;
+
+                closeArea = false;
 
                 var point = {
                     x: e.pageX - canvas.offsetLeft,
@@ -197,40 +205,51 @@
 
                 var str = 'Click to add new point.';
 
-                ctx.fillStyle = '#3f3f3f';
-                ctx.fillRect(point.x + 10, point.y + 10, 70, 20);
-                ctx.fillStyle = '#fff';
-                ctx.font = '18px calibri';
-                ctx.fillText(str, point.x + 10, point.y + 25, 60);
+
+                ctx.fillText(str, point.x, point.y);
 
                 for (i = 0; i<points.length; i++) {
-                    /*if ((point.x == points[i].x) && (point.y == points[i].y)) {
-                        str = 'Click to move current point.';
+                    str = 'Point: ' + i;
 
+                    if (i > 0) {
+                        ctx.lineTo(points[i].x, points[i].y);
+                        ctx.stroke();
+                    }
+                    else {
+                        ctx.beginPath();
+                        ctx.moveTo(points[i].x, points[i].y);
+                    }
+                    
+                    
+
+                    ctx.fillStyle = '#3f3f3';
+                    //  ctx.fillRect(points[i].x, points[i].y, 0, 0);
+                    ctx.fillRect(points[i].x, points[i].y, 5, 5);
+                    ctx.fillStyle = '#fff';
+
+                    if ((point.x == points[i].x) && (point.y == points[i].y)) {
+                        str = 'Click to move current point.';
+                        movePoint = true;
+                        currentPoint = point;
                         ctx.fillStyle = '#3f3f3f';
                         ctx.fillRect(point.x + 10, point.y + 10, 70, 20);
                         ctx.fillStyle = '#fff';
                         ctx.font = 'bold 20px verdana';
-                        ctx.fillText(str, point.x + 10, point.y + 25, 60);
-                    }*/
-                        str = 'Point: ' + i;
-
-                        ctx.fillStyle = '#3f3f3f';
-                        ctx.fillRect(points[i].x + 10, points[i].y + 10, 70, 20);
-                        ctx.fillStyle = '#fff';
-                        ctx.font = '18px verdana';
-                        ctx.fillText(str, points[i].x + 10, points[i].y + 25, 60);
+                        ctx.fillText(str, point.x, point.y, 60);
+                    }
                 }
 
                 if ((point.x == points[0].x) && (point.y == points[0].y)) {
-                    str = 'Click to close area.';
 
+                    str = 'Click to close area.';
+                    closeArea = true;
                     ctx.fillStyle = '#3f3f3f';
-                    ctx.fillRect(point.x + 10, point.y + 10, 70, 20);
+                    ctx.fillRect(point.x, point.y, 0, 0);
                     ctx.fillStyle = '#fff';
                     ctx.font = '18px calibri';
-                    ctx.fillText(str, point.x + 10, point.y + 25, 60);
+                    ctx.fillText(str, point.x, point.y);
                 }
+                
 
             }, 0);
 
@@ -243,15 +262,46 @@
                     y: e.pageY - canvas.offsetTop
                 }
 
-                var arrayLength = points.push(point);
+                if (closeArea) {
+                    ctx.closePath();
+                    areas.push(points);
+                    points = new Array();
+            }
+                if (movePoint) {
+                    currentPoint = point;
+            }
+                else {
 
-                var str = 'New point added.';
-                ctx.fillStyle = '#3f3f3f';
-                ctx.fillRect(point.x + 10, point.y + 10, 70, 20);
-                ctx.fillStyle = '#fff';
-                ctx.font = '18px calibri';
-                ctx.fillText(str, point.x + 10, point.y + 25, 60);
-            }, 0);
+                    if (points.length > 0) {
+
+                    
+                        ctx.beginPath();
+                        ctx.moveTo(25, 25);
+
+                        var arrayLength = points.push(point);
+
+                        var str = 'New point added.';
+                        ctx.fillStyle = '#3f3f3f';
+                        ctx.fillRect(point.x, point.y, 0, 0);
+                        ctx.fillStyle = '#fff';
+                        ctx.font = '18px calibri';
+                        ctx.fillText(str, point.x, point.y);
+                    }
+                    else {
+                        var arrayLength = points.push(point);
+
+                        var str = 'New point added.';
+                        ctx.fillStyle = '#3f3f3f';
+                        ctx.fillRect(point.x, point.y, 0, 0);
+                        ctx.fillStyle = '#fff';
+                        ctx.font = '18px calibri';
+                        ctx.fillText(str, point.x, point.y);
+                    }
+                }
+
+                ctx.fill();
+                }, 0);
+
 
         });
 
