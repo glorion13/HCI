@@ -1,0 +1,5 @@
+c:\users\joshua.salwen\documents\visual studio 2010\Projects\NuGetsForHtml5Boilerplate\Html5Boilerplate.AspNet.WebForm\bin\Debug\Html5Boilerplate.AspNet.WebForm.dll
+c:\users\joshua.salwen\documents\visual studio 2010\Projects\NuGetsForHtml5Boilerplate\Html5Boilerplate.AspNet.WebForm\bin\Debug\Html5Boilerplate.AspNet.WebForm.pdb
+c:\users\joshua.salwen\documents\visual studio 2010\Projects\NuGetsForHtml5Boilerplate\Html5Boilerplate.AspNet.WebForm\obj\Debug\ResolveAssemblyReference.cache
+c:\users\joshua.salwen\documents\visual studio 2010\Projects\NuGetsForHtml5Boilerplate\Html5Boilerplate.AspNet.WebForm\obj\Debug\Html5Boilerplate.AspNet.WebForm.dll
+c:\users\joshua.salwen\documents\visual studio 2010\Projects\NuGetsForHtml5Boilerplate\Html5Boilerplate.AspNet.WebForm\obj\Debug\Html5Boilerplate.AspNet.WebForm.pdb
