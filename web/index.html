@@ -45,6 +45,11 @@
             right: 0;
             height: 100px;
         }
+
+            #images li
+            {
+                float: left;
+            }
               
         #board
         {
@@ -95,17 +100,18 @@
 <body>
     <div id="ui">
         <div id="images">    
+            <input type="file" id="fileOpenDialog" name="files[]" multiple />
             <ul>
-                <li><img src="Samples/IMG_3104.JPG" /></li>
                 <li>
                 <img id="image" src="apple-touch-icon-57x57-precomposed.png" />
                 </li>
                 <li>
-                <input type="file" id="files" name="files[]" multiple />
+                
                 </li>
                 <li>
                 <output id="list"></output>
                 </li>
+                <li><img src="Samples/IMG_3104.JPG" /></li>
             </ul>
         </div>
         <div id="areas">
@@ -121,12 +127,13 @@
 
         <div id="board">
             <canvas id="canvas"></canvas>
-            <!--<img src="Samples/IMG_3104.JPG" />-->
+            <img src="Samples/IMG_3104.JPG" />
         </div>
 
         
 
         <div id="toolbar">
+
         </div>
     </div>
 
@@ -141,53 +148,63 @@
     <script>
         $("#image").click(function () {
             $("#files").click();
-            
         });
-    </script>
 
-    <script>
-        function handleFileSelect(evt) {
-            var files = evt.target.files; // FileList object
+        var images = new Array();
+
+        function addImageToList(image) {
+            // Render thumbnail.
+            /*var span = document.createElement('span');
+            span.innerHTML = ['<img class="thumb" src="', image.data,
+                            '" title="', image.filename, '"/>'].join('');*/
+
+            // This line is what replaces the image with the new image
+            $("#image").attr("src", image.data);
+        }
+
+
+        $("#fileOpenDialog").change(function (e) {
+            var files = e.target.files; // FileList object
 
             // Loop through the FileList and render image files as thumbnails.
-            for (var i = 0, f; f = files[i]; i++) {
+            for (var i = 0, file; file = files[i]; i++) {
 
                 // Only process image files.
-                if (!f.type.match('image.*')) {
+                if (!file.type.match('image.*')) {
                     continue;
                 }
 
                 var reader = new FileReader();
 
                 // Closure to capture the file information.
-                reader.onload = (function(theFile) {
-                    return function(e) {
-                        // Render thumbnail.
-                        var span = document.createElement('span');
-                        span.innerHTML = ['<img class="thumb" src="', e.target.result,
-                            '" title="', theFile.name, '"/>'].join('');
+                reader.onload = (function (theFile) {
+                    return function (e) {
+                        var image = {
+                            filename: theFile.name,
+                            data: e.target.result
+                        }
 
-                            // This line is what replaces the image with the new image
-                        $("#image").attr("src", e.target.result);
+                        images.push(image);
+                        addImageToList(image);
                     };
-                })(f);
+                })(file);
 
                 // Read in the image file as a data URL.
-                reader.readAsDataURL(f);
+                reader.readAsDataURL(file);
             }
-        }
-        document.getElementById('files').addEventListener('change', handleFileSelect, false);
+        });
+
 
         $(function () {
 
             var canvas = $('#canvas').get(0);
             var ctx = canvas.getContext('2d');
             var w = h = canvas.width = canvas.height = 300;
-            
+
             var points = new Array();
 
             canvas.addEventListener('mousemove', function (e) {
-                
+
                 canvas.width = canvas.width;
 
                 var point = {
@@ -203,7 +220,7 @@
                 ctx.font = '18px calibri';
                 ctx.fillText(str, point.x + 10, point.y + 25, 60);
 
-                for (i = 0; i<points.length; i++) {
+                for (i = 0; i < points.length; i++) {
                     /*if ((point.x == points[i].x) && (point.y == points[i].y)) {
                         str = 'Click to move current point.';
 
@@ -213,13 +230,13 @@
                         ctx.font = 'bold 20px verdana';
                         ctx.fillText(str, point.x + 10, point.y + 25, 60);
                     }*/
-                        str = 'Point: ' + i;
+                    str = 'Point: ' + i;
 
-                        ctx.fillStyle = '#3f3f3f';
-                        ctx.fillRect(points[i].x + 10, points[i].y + 10, 70, 20);
-                        ctx.fillStyle = '#fff';
-                        ctx.font = '18px verdana';
-                        ctx.fillText(str, points[i].x + 10, points[i].y + 25, 60);
+                    ctx.fillStyle = '#3f3f3f';
+                    ctx.fillRect(points[i].x + 10, points[i].y + 10, 70, 20);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '18px verdana';
+                    ctx.fillText(str, points[i].x + 10, points[i].y + 25, 60);
                 }
 
                 if ((point.x == points[0].x) && (point.y == points[0].y)) {
@@ -235,7 +252,7 @@
             }, 0);
 
             canvas.addEventListener('mousedown', function (e) {
-                
+
                 canvas.width = canvas.width;
 
                 var point = {
