@@ -112,11 +112,13 @@
         <div id="images">    
             <div class=""><input type="file" id="fileOpenDialog" name="files[]" multiple /></div>
             <ul>
-                <li>
+                <li id="addImageButton">
                     <img id="image" src="Images/folder32.png" />
                     <p>Open a new image</p>
                 </li>
-                <li><img src="Samples/IMG_3104.JPG" /></li>
+                <li class="thumbnail">
+                    <img src="Samples/IMG_3104.JPG" />
+                </li>
             </ul>
         </div>
         <div id="areas">
@@ -157,10 +159,18 @@
             $("#fileOpenDialog").click();
         });
 
+        $("#images li.thumbnail").live("click", function () {
+            var image = $(this).find("img");
+            if (image) {
+                $("#board img").attr("src", image.attr("src"));
+                return false;
+            }
+        });
+
         var images = new Array();
 
         function addImageToList(image) {
-            $('<li><img src="' + image.data + '" title="' + image.filename + '" /><p>' + image.filename + '<p/></li>')
+            $('<li class="thumbnail"><img src="' + image.data + '" title="' + image.filename + '" /><p>' + image.filename + '<p/></li>')
                 .appendTo("#images ul");
         }
 
