@@ -249,6 +249,9 @@
 
             var closeArea = false;
             var movePoint = false;
+            var areaClosed = false;
+
+            var movedPoint;
             var currentPoint;
             
             var points = new Array();
@@ -256,77 +259,124 @@
 
             canvas.addEventListener('mousemove', function (e) {
 
-            // Initialize and reset some variables
-                var point = {
-                    x: e.pageX - offset.left,
-                    y: e.pageY - offset.top
-                }
-                closeArea = false;
-
-                // Redraw canvas
-                redrawCanvas(canvas, ctx, points);
-                
-                // Text to print normally
-
-                for (i = 0; i < points.length; i++) {
-                // If the mouse is over an existing point allow for movement
-                    if ((point.x == points[i].x) && (point.y == points[i].y)) {
-                        movePoint = true;
-                        currentPoint = point;
+                    // Initialize and reset some variables
+                    var point = {
+                        x: e.pageX - offset.left,
+                        y: e.pageY - offset.top
                     }
-                }
-                // If the mouse is over the first point of the area allow for closure
-                if ((point.x == points[0].x) && (point.y == points[0].y)) {
-                    closeArea = true;
-                }
-                if (closeArea) {
-                    var str = 'Click to close area.';
-                    writeOnCanvas(ctx, str, point.x, point.y);
-                }
-                else if (movePoint) {
-                    var str = 'Click to move current point.';
-                    writeOnCanvas(ctx, str, point.x, point.y);
-                }
-                else {
-                    var str = 'Click to add new point.';
-                    writeOnCanvas(ctx, str, point.x, point.y);
-                }
+                    closeArea = false;
+                    movePoint = false;
 
+                    // Redraw canvas
+                    redrawCanvas(canvas, ctx, points);
+
+                    // Text to print normally
+
+                    for (i = 0; i < points.length; i++) {
+                        // If the mouse is over an existing point allow for movement
+                        if ((point.x == points[i].x) && (point.y == points[i].y)) {
+                            movePoint = true;
+                            currentPoint = point;
+                        }
+                    }
+                    // If the mouse is over the first point of the area allow for closure
+                    if (points.length > 0) {
+                        if ((point.x == points[0].x) && (point.y == points[0].y)) {
+                            closeArea = true;
+                        }
+                        if (closeArea) {
+                            var str = 'Click to close area.';
+                            writeOnCanvas(ctx, str, point.x, point.y);
+                        }
+                        else if (movePoint) {
+                            var str = 'Click to move current point.';
+                            writeOnCanvas(ctx, str, point.x, point.y);
+                        }
+                        else {
+                            var str = 'Click to add new point.';
+                            writeOnCanvas(ctx, str, point.x, point.y);
+                        }
+                    }
+                    else {
+                        if (!closeArea) {
+                            var str = 'Click to add new point.';
+                            writeOnCanvas(ctx, str, point.x, point.y);
+                        }
+                        else {
+                        // if the area is closed and the user clicks on a new point
+                        }
+                    }
 
 
             }, 0);
 
-            canvas.addEventListener('mousedown', function (e) {
+           /* canvas.addEventListener('mousedown', function (e) {
 
-            // Initialize and reset some variables
+                // Initialize and reset some variables
                 var point = {
                     x: e.pageX - offset.left,
                     y: e.pageY - offset.top
                 }
 
-                // Redraw canvas
-                redrawCanvas(canvas, ctx, points);
-
-                // If the first point of the area was clicked then close the area
-                if (closeArea) {
-                    points.push(point);
-                    areas.push(points);
-
-                    // Text to print
-                    var str = 'Area closed.';
-                    writeOnCanvas(ctx, str, point.x, point.y);
-                }
-                    // If an existing point of the area was clicked then move the point
                 if (movePoint) {
-                    // movement of point
-            }
-                // Otherwise simply the point to the area
-                else {
-                    points.push(point);
+                    movedPoint = point;
+                    movement = true;
+                    if (movement) {
+                        for (i = 0; i < points.length; i++) {
+
+                            if ((currentPoint.x == points[i].x) && (currentPoint.y == points[i].y)) {
+                                points.push(movedPoint);
+                            }
+                            else {
+                                points.push(points[i]);
+                            }
+                        }
+                    }
                 }
+            }, 0);*/
+
+            canvas.addEventListener('mouseup', function (e) {
+
+                if (!areaClosed) {
+                    // Initialize and reset some variables
+                    var point = {
+                        x: e.pageX - offset.left,
+                        y: e.pageY - offset.top
+                    }
+                    movePoint = false;
+                    movement = false;
+
+                    // Redraw canvas
+                    redrawCanvas(canvas, ctx, points);
+
+                    // If the first point of the area was clicked then close the area
+                    if (closeArea) {
+                        points.push(point);
+                        areas.push(points);
+
+                        areaClosed = true;
+                        redrawCanvas(canvas, ctx, points);
+
+                        // Text to print
+                        var str = 'Area closed.';
+                        writeOnCanvas(ctx, str, point.x, point.y);
+                    }
+                    // If an existing point of the area was clicked then move the point
+                    else if (movePoint) {
+                        // movement of point
+                        points.push(point);
+                    }
+                    // Otherwise simply the point to the area
+                    else {
+                        points.push(point);
+                        redrawCanvas(canvas, ctx, points);
+
+                        var str = 'New point added.';
+                        writeOnCanvas(ctx, str, point.x, point.y);
+                    }
+                }
+
                 }, 0);
-
-
         });
 
 </script>
