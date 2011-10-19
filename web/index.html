@@ -270,13 +270,21 @@
                 canvas.width = canvas.width;
 
                 var point = {
-                    x: e.pageX - canvas.offsetLeft,
-                    y: e.pageY - canvas.offsetTop
+                    x: e.pageX - offset.left,
+                    y: e.pageY - offset.top
                 }
 
                 if (closeArea) {
+                    var arrayLength = points.push(point);
                     ctx.closePath();
                     areas.push(points);
+
+                    var str = 'New point added.';
+                    ctx.fillStyle = '#3f3f3f';
+                    ctx.fillRect(point.x, point.y, 0, 0);
+                    ctx.font = '18px calibri';
+                    ctx.fillText(str, point.x, point.y);
+
                     points = new Array();
             }
                 if (movePoint) {
@@ -285,27 +293,13 @@
                 else {
 
                     if (points.length > 0) {
-
-                    
-                        ctx.beginPath();
-                        ctx.moveTo(25, 25);
-
                         var arrayLength = points.push(point);
 
-                        var str = 'New point added.';
-                        ctx.fillStyle = '#3f3f3f';
-                        ctx.fillRect(point.x, point.y, 0, 0);
-                        ctx.font = '18px calibri';
-                        ctx.fillText(str, point.x, point.y);
                     }
                     else {
+                        ctx.beginPath();
                         var arrayLength = points.push(point);
 
-                        var str = 'New point added.';
-                        ctx.fillStyle = '#3f3f3f';
-                        ctx.fillRect(point.x, point.y, 0, 0);
-                        ctx.font = '18px calibri';
-                        ctx.fillText(str, point.x, point.y);
                     }
                 }
 
