@@ -260,13 +260,15 @@
             // Returns an array with a new point inserted after a given point in a point array
 
             var newPoint = {
-                x: Math.round((point1.x + point2.x) / 2),
-                y: Math.round((point2.x + point2.y) / 2)
+                x: Math.round((points[index].x + points[index+1].x) / 2),
+                y: Math.round((points[index].y + points[index+1].y) / 2)
             }
             newPointsArray = new Array();
             for (var i = 0; i < index + 1; i++) { newPointsArray.push(points[i]); }
             newPointsArray.push(newPoint);
-            for (var i = index + 1; i < index.left; i++) { newPointsArray.push(points[i]); }
+            for (var i = index + 1; i < points.length; i++) { newPointsArray.push(points[i]); }
+
+            return newPointsArray;
         }
 
         $(function () {
@@ -283,6 +285,7 @@
             var movePoint = false;
             var areaClosed = false;
             var movement = false;
+            var insert = false;
 
             var movedPoint;
             var currentPoint;
@@ -298,6 +301,8 @@
                         y: e.pageY - offset.top
                     }
                     closeArea = false;
+                    if (!movement) { movePoint = false; }
+                    insert = false;
 
                     // Redraw canvas
                     redrawCanvas(canvas, ctx, points, radius);
@@ -315,7 +320,6 @@
                         writeOnCanvas(ctx, str, point.x, point.y);
                     }
                     else {
-                        movePoint = false;
                         for (i = 0; i < points.length; i++) {
 
                             // If the mouse is over an existing point allow for movement
@@ -330,6 +334,20 @@
                             if (isInRadius(point, points[0], radius)) {
                                 closeArea = true;
                             }
+                            /////// TEST CASE FOR INSERTION
+                            if (points.length > 1) {
+                                var midPoint = {
+                                    x: Math.round((points[0].x + points[1].x) / 2),
+                                    y: Math.round((points[0].y + points[1].y) / 2)
+                                }
+                                if (isInRadius(point, midPoint, radius)) {
+                                    insert = true;
+                                    var str = 'Click to insert point.';
+                                    writeOnCanvas(ctx, str, point.x, point.y);
+                                }
+                            }
+                            ///////////////// END TEST CASE
+
                             // Print this if the user can close the area
                             if ((closeArea) && (points.length > 2) && (!areaClosed)) {
                                 var str = 'Click to close area or drag to move point.';
@@ -397,7 +415,10 @@
                         writeOnCanvas(ctx, str, point.x, point.y);
                     }
                     // If an existing point of the area was clicked then move the point
-                    if (movePoint) {
+                    else if (movePoint) {
+                    }
+                    else if (insert) {
+                        points = insertPoint(0, points);
                     }
 
                     // Otherwise simply the point to the area
