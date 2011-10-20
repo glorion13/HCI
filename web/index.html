@@ -112,7 +112,7 @@
             left: 0;
             bottom: 90px;
             right: 250px;
-            overflow: auto;
+            overflow: hidden;
         }
 
         #board
@@ -200,6 +200,10 @@
 	<![endif]-->
     <script>
         (function ($) {
+            function distance(a, b) {
+                return Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+            }
+
             function Image(name, src) {
                 this.name = name;
                 this.src = src;
@@ -220,8 +224,32 @@
                 }
             };
 
+            Image.prototype.hasPoint = function (point, radius) {
+                for (var i = 0; i < this.areas.length; i++) {
+                    var area = this.areas[i];
+                    var point = area.hasPoint(point, radius);
+                    if (point) {
+                        return { 
+                            area: area,
+                            point: point
+                        };
+                    }
+                }
+                return false;
+            }
+
             function Area() {
                 this.points = new Array();
+                this.closed = false;
+            }
+
+            Area.prototype.hasPoint = function (point, radius) {
+                for (var i = 0; i < this.points.length; i++) {
+                    var p = this.points[i];
+                    if (distance(point, p) <= radius)
+                        return p;
+                }
+                return false;
             }
 
             var TagHipster = window.TagHipster = function ($openDialog, $imagePanel, $board, $toolbar, $areaList) {
@@ -231,8 +259,15 @@
                 this.$toolbar = $toolbar;
                 this.$areaList = $areaList;
 
-                var images = new Array();
-                var activeArea;
+                var images = [];
+                var currentImage;
+                var currentArea;
+                var canvases = [];
+
+                function clearBoard() {
+                    canvases.length = 0;
+                    $board.find("canvas").remove();
+                }
 
                 function addImage(filename, src) {
                     var image = new Image(filename, src);
@@ -247,19 +282,99 @@
                 }
 
                 function selectImage(image) {
-                    $("#board img").attr("src", image.src);
+                    currentImage = image;
+
+                    clearBoard();
+
+                    var imageTag = $board.find("img");
+                    imageTag.attr("src", image.src);
+
                     $areaList.empty();
-                    for (var area in image.areas) {
-                        var areaMarkup = $('<div><h2>Some area</h2><ul></ul></div>');
+                    for (var i = 0; i < image.areas.length; i++) {
+                        var area = image.areas[i];
+                        var areaMarkup = $('<div class="area"><h2>Some area</h2><ul></ul></div>');
                         var list = areaMarkup.find("ul");
                         list.append("<li>Point</li>");
                         $areaList.append(areaMarkup);
+                        areaMarkup.data("area", area);
+
+                        var canvas = $('<canvas />');
+                        canvas[0].height = imageTag.height();
+                        canvas[0].width = imageTag.width();
+                        canvas.appendTo($board);
+                        canvases[area] = canvas;
+                        repaintArea(area);
                     }
 
                     if (image.areas.length > 0) {
-                        activeArea = image.areas[image.areas.length - 1];
+                        selectArea(image.areas[image.areas.length - 1]);
                     } else {
-                        activeArea = null;
+                        selectArea(null);
+                    }
+                }
+
+                function selectArea(area) {
+                    currentArea = area;
+                }
+
+
+                function startArea(ctx, x, y) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                }
+
+                function continueArea(ctx, x, y) {
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+                }
+
+                function clearCanvas(canvas) {
+                    canvas[0].width = canvas[0].width;
+                }
+
+                function drawPoint(ctx, x, y) {
+                    //start drawing
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    //draw arc: arc(x, y, radius, startAngle, endAngle, anticlockwise)
+                    ctx.arc(x, y, 5, Math.PI * 2, 0, true);
+                    //end drawing
+                    ctx.moveTo(x, y);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                function redrawCanvas(ctx, area) {
+                    if (area.points.length == 0)
+                        return;
+
+                    for (var i = 0; i < area.points.length; i++) {
+                        if (i > 0) {
+                            continueArea(ctx, area.points[i].x, area.points[i].y);
+                        }
+                        else {
+                            startArea(ctx, area.points[i].x, area.points[i].y);
+                        }
+                        drawPoint(ctx, area.points[i].x, area.points[i].y);
+                    }
+
+                    if (area.closed) {
+                        continueArea(ctx, area.points[0].x, area.points[0].y);
+                    }
+                }
+
+                function repaintArea(area) {
+                    var canvas = canvases[area];
+                    if (!canvas) {
+                        alert("canvas lost :(");
+                    } else {
+                        var context = canvas.data("context");
+                        if (!context) {
+                            context = canvas[0].getContext('2d');
+                            canvas.data("context", context);
+                        }
+                        clearCanvas(canvas);
+                        redrawCanvas(context, area);
                     }
                 }
 
@@ -298,6 +413,134 @@
                     }
                 });
 
+                var mouseDown;
+                var draggedPoint;
+                
+                var Mode = {
+                    Click: 0,
+                    Pan: 1,
+                    DragPoint: 2,
+                    DragArea: 3,
+                    CloseArea: 4
+                }
+
+                var currentMode = Mode.Click;
+
+                function getLocalCoords(mouseEvent) {
+                    var offset = $board.offset();
+                    var coords = {
+                        x: mouseEvent.pageX - offset.left,
+                        y: mouseEvent.pageY - offset.top
+                    }
+                    return coords;
+                }
+
+                function scrollImage(mouseEvent) {
+                    var current = getLocalCoords(mouseEvent);
+
+                    var $scrollView = $board.parent();
+                    var left = $scrollView.scrollLeft();
+                    left += mouseDown.x - current.x;
+                    if (left < 0)
+                        left = 0;
+                    $scrollView.scrollLeft(left);
+
+                    var top = $scrollView.scrollTop();
+                    top += mouseDown.y - current.y;
+                    if (top < 0)
+                        top = 0;
+                    $scrollView.scrollTop(top);
+                }
+
+                function dragPoint(mouseEvent) {
+                    var current = getLocalCoords(mouseEvent);
+                    draggedPoint.x = current.x;
+                    draggedPoint.y = current.y;
+                    repaintArea(currentArea);
+                }
+
+                $board.mousedown(function (e) {
+                    if (currentImage) {
+                        mouseDown = getLocalCoords(e);
+                        currentMode = Mode.Click;
+
+                        if (currentImage) {
+                            var locatedPoint = currentImage.hasPoint(mouseDown, 8); 
+                            if (locatedPoint) {
+                                draggedPoint = locatedPoint.point;
+                                if (currentArea && !currentArea.closed && currentArea == locatedPoint.area && currentArea.points[0] == locatedPoint.point) {
+                                    currentMode = Mode.CloseArea;
+                                } else {
+                                    selectArea(locatedPoint.area);
+                                    currentMode = Mode.DragPoint;
+                                }
+                            }
+                        }
+                        return false;
+                    }
+                });
+
+                $("body").mousemove(function (e) {
+                    if (mouseDown) {
+                        var coords = getLocalCoords(e);
+
+                        if (currentMode == Mode.Click) {
+                            if (distance(coords, mouseDown) > 5) {
+                                currentMode = Mode.Pan;
+                            }
+                        } else if (currentMode == Mode.CloseArea) {
+                            if (distance(coords, mouseDown) > 5) {
+                                currentMode = Mode.DragPoint;
+                            }
+                        }
+
+                        switch (currentMode) {
+                            case Mode.Pan:
+                                scrollImage(e);
+                                break;
+
+                            case Mode.DragPoint:
+                                dragPoint(e);
+                            default:
+                                break;
+                        }                      
+                    }
+                });
+
+                $("body").mouseup(function (e) {
+                    if (currentImage) {
+                        if (mouseDown) {
+                            var coords = getLocalCoords(e);
+
+                            switch (currentMode) {
+                                case Mode.Click:
+                                    if (!currentArea) {
+                                        var area = currentImage.createArea();
+                                        selectArea(area);
+                                    }
+                                    currentArea.points.push(coords);
+                                    repaintArea(currentArea);
+                                    break;
+                                case Mode.CloseArea:
+                                    currentArea.closed = true;
+                                    repaintArea(currentArea);
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                            mouseDown = null;
+                            return false;
+                        }
+                    }
+                });
+
+                $("body").mouseenter(function (e) {
+                    if (!e.button) {
+                        mouseDown = null;
+                    }
+                });
+
                 addImage("test", "Samples/IMG_3104.JPG");
             }
 
@@ -305,55 +548,18 @@
         })(jQuery);
 
         var app = new TagHipster($("#fileOpenDialog"), $("#images"), $("#board"), $("#toolbar"), $("#areas"));
-
+        /*
         function writeOnCanvas(ctx, str, x, y) {
             ctx.font = '18px calibri';
             ctx.fillText(str, x, y);
         }
 
-        function startArea(ctx, x, y) {
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-        }
-
-        function continueArea(ctx, x, y) {
-            ctx.lineTo(x, y);
-            ctx.stroke();
-        }
-
-        function clearCanvas(canvas) {
-            canvas.width = canvas.width;
-        }
-
-        function drawPoint(ctx, x, y, radius) {
-            //start drawing
-            ctx.beginPath();
-            //draw arc: arc(x, y, radius, startAngle, endAngle, anticlockwise)
-            ctx.arc(x, y, radius, Math.PI * 2, 0, true);
-            //end drawing
-            ctx.closePath();
-            ctx.fill();
-        }
 
         function isInRadius(point1, point2, radius) {
             if ((point1.x > point2.x - radius) && (point1.x < point2.x + radius) && (point1.y > point2.y - radius) && (point1.y < point2.y + radius)) {
                 return true;
             }
             return false;
-        }
-
-        function redrawCanvas(canvas, ctx, points, radius) {
-            clearCanvas(canvas);
-
-            for (i = 0; i < points.length; i++) {
-                if (i > 0) {
-                    continueArea(ctx, points[i].x, points[i].y);
-                }
-                else {
-                    startArea(ctx, points[i].x, points[i].y);
-                }
-                drawPoint(ctx, points[i].x, points[i].y, radius);
-            }
         }
 
         function insertPoint(index, points) {
@@ -554,7 +760,7 @@
 
             }, 0);
         });
-
+        */
 </script>
 </body>
 </html>
