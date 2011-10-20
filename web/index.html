@@ -256,12 +256,26 @@
             }
         }
 
+        function insertPoint(index, points) {
+            // Returns an array with a new point inserted after a given point in a point array
+
+            var newPoint = {
+                x: Math.round((point1.x + point2.x) / 2),
+                y: Math.round((point2.x + point2.y) / 2)
+            }
+            newPointsArray = new Array();
+            for (var i = 0; i < index + 1; i++) { newPointsArray.push(points[i]); }
+            newPointsArray.push(newPoint);
+            for (var i = index + 1; i < index.left; i++) { newPointsArray.push(points[i]); }
+        }
+
         $(function () {
 
             var canvas = $('#canvas').get(0);
             var offset = $('#canvas').offset();
             var ctx = canvas.getContext('2d');
-            var w = h = canvas.width = canvas.height = 300;
+            var w = canvas.width = 2560;
+            var h = canvas.height = 1800;
 
             var radius = 4;
 
@@ -291,8 +305,7 @@
                     if (movement) {
                         for (i = 0; i < points.length; i++) {
                             if ((currentPoint.x == points[i].x) && (currentPoint.y == points[i].y)) {
-                                if ((i == 0) || (i == points.length-1)) { points[length - 1] = point; points[0] = points[length - 1]; }
-                                else { points[i] = point; }
+                                points[i] = point;
                                 currentPoint = point;
                             }
                         }
