@@ -155,6 +155,38 @@
 	<![endif]-->
 
     <script>
+        (function ($) {
+            if (typeof window.TagHipster == "undefined") {
+                var TagHipster = window.TagHipster = function ($openDialog, $imagePanel, $board, $toolbar, $areaList) {
+                    if (typeof $ === "undefined" || $ !== window.jQuery) {
+                        alert("Please load jQuery library first");
+                        return;
+                    }
+
+                    this.$openDialog = $openDialog;
+                    this.$imagePanel = $imagePanel;
+                    this.$board = $board;
+                    this.$toolbar = $toolbar;
+                    this.$areaList = $areaList;
+                }
+
+                TagHipster.prototype = {
+                    init: function () {
+
+                    },
+
+                    openDialog: function () {
+                        $openDialog.click();
+                    }
+                }
+            }
+
+        })(jQuery);
+
+        var app = new TagHipster($("#fileOpenDialog"), $("#images"), $("#board"), $("#toolbar"), $("#areas"));
+        app.init();
+
+
         $("#image").click(function () {
             $("#fileOpenDialog").click();
         });
