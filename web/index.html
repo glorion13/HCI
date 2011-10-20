@@ -271,7 +271,34 @@
             return newPointsArray;
         }
 
+        function isBetween(c, a, b) {
+            var crossproduct = (c.y - a.y) * (b.x - a.x) - (c.x - a.x) * (b.y - a.y);
+            if (Math.abs(crossproduct) != 0) { return false; }
+
+            dotproduct = (c.x - a.x) * (b.x - a.x) + (c.y - a.y) * (b.y - a.y);
+            if (dotproduct < 0) { return false; }
+
+            squaredLengthBa = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
+            if (dotproduct > squaredLengthBa) { return false; }
+      
+            return true;
+        }
+
         $(function () {
+
+            var test1 = {
+                x: 3,
+            y: 3
+            }
+            var test2 = {
+                x: 1,
+                y: 1
+            }
+            var test3 = {
+                x: 2,
+                y: 2
+            }
+            alert(isBetween(test3, test1, test2));
 
             var canvas = $('#canvas').get(0);
             var offset = $('#canvas').offset();
@@ -327,6 +354,13 @@
                                 movePoint = true;
                                 currentPoint = points[i];
                             }
+                            else if (i > 0) {
+                                if (isBetween(point, points[i - 1], points[i])) {
+                                    insert = true;
+                                    var str = 'Click to insert point.';
+                                    writeOnCanvas(ctx, str, point.x, point.y);
+                                }
+                            }
                         }
 
                         if (points.length > 0) {
@@ -334,19 +368,6 @@
                             if (isInRadius(point, points[0], radius)) {
                                 closeArea = true;
                             }
-                            /////// TEST CASE FOR INSERTION
-                            if (points.length > 1) {
-                                var midPoint = {
-                                    x: Math.round((points[0].x + points[1].x) / 2),
-                                    y: Math.round((points[0].y + points[1].y) / 2)
-                                }
-                                if (isInRadius(point, midPoint, radius)) {
-                                    insert = true;
-                                    var str = 'Click to insert point.';
-                                    writeOnCanvas(ctx, str, point.x, point.y);
-                                }
-                            }
-                            ///////////////// END TEST CASE
 
                             // Print this if the user can close the area
                             if ((closeArea) && (points.length > 2) && (!areaClosed)) {
