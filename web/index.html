@@ -321,30 +321,16 @@
             var crossproduct = (c.y - a.y) * (b.x - a.x) - (c.x - a.x) * (b.y - a.y);
             if (Math.abs(crossproduct) != 0) { return false; }
 
-            dotproduct = (c.x - a.x) * (b.x - a.x) + (c.y - a.y) * (b.y - a.y);
+            var dotproduct = (c.x - a.x) * (b.x - a.x) + (c.y - a.y) * (b.y - a.y);
             if (dotproduct < 0) { return false; }
 
-            squaredLengthBa = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
+            var squaredLengthBa = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
             if (dotproduct > squaredLengthBa) { return false; }
       
             return true;
         }
 
         $(function () {
-
-            var test1 = {
-                x: 3,
-            y: 3
-            }
-            var test2 = {
-                x: 1,
-                y: 1
-            }
-            var test3 = {
-                x: 2,
-                y: 2
-            }
-            alert(isBetween(test3, test1, test2));
 
             var canvas = $('#canvas').get(0);
             var offset = $('#canvas').offset();
