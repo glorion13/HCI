@@ -22,9 +22,10 @@
 
 
     <style>
-        body
+        body, html
         {
             background-color: #dedede;
+            overflow: hidden;
         }
     
         #ui > div
@@ -78,7 +79,6 @@
         
         #areas
         {
-            background-color: #ffd800;
             width: 250px;
             top: 100px;
             bottom: 900px;
@@ -93,6 +93,24 @@
             right: 0;
             height: 90px;
             background: url(Images/shadow-bottom.png) #6b6b6b repeat-x top;
+        }
+
+        #toolbar .button
+        {
+            height: 18px;
+            width: 72px;
+            margin: 3px 10px;
+            cursor: pointer;
+            border: 2px solid #ffd800;
+            padding: 58px 4px 4px 4px;
+            border-radius: 2px;
+            text-align: center;
+            
+        }
+
+        .add-region-button
+        {
+            background: url(Images/add-region.png) no-repeat center 2px;
         }
 
         #images li img
@@ -139,7 +157,9 @@
         
 
         <div id="toolbar">
-
+            <div class="button add-region-button">
+                new region
+            </div>
         </div>
     </div>
 
@@ -185,6 +205,7 @@
                 this.$areaList = $areaList;
 
                 var images = new Array();
+                var activeArea;
 
                 function addImage(filename, src) {
                     var image = new Image(filename, src);
@@ -206,6 +227,12 @@
                         var list = areaMarkup.find("ul");
                         list.append("<li>Point</li>");
                         $areaList.append(areaMarkup);
+                    }
+
+                    if (image.areas.length > 0) {
+                        activeArea = image.areas[image.areas.length - 1];
+                    } else {
+                        activeArea = null;
                     }
                 }
 
@@ -344,7 +371,7 @@
                 x: 2,
                 y: 2
             }
-            alert(isBetween(test3, test1, test2));
+            //alert(isBetween(test3, test1, test2));
 
             var canvas = $('#canvas').get(0);
             var offset = $('#canvas').offset();
