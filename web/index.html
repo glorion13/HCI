@@ -116,9 +116,6 @@
                     <img id="image" src="Images/folder32.png" />
                     <p>Open a new image</p>
                 </li>
-                <li class="thumbnail">
-                    <img src="Samples/IMG_3104.JPG" />
-                </li>
             </ul>
         </div>
         <div id="areas">
@@ -155,56 +152,105 @@
 	<![endif]-->
 
     <script>
-        $("#image").click(function () {
-            $("#fileOpenDialog").click();
-        });
-
-        $("#images li.thumbnail").live("click", function () {
-            var image = $(this).find("img");
-            if (image) {
-                $("#board img").attr("src", image.attr("src"));
-                return false;
+        (function ($) {
+            function Image(name, src) {
+                this.name = name;
+                this.src = src;
+                this.areas = new Array();
+                this.createArea();
             }
-        });
 
-        var images = new Array();
+            Image.prototype.createArea = function () {
+                var area = new Area();
+                this.areas.push(area);
+                return area;
+            };
 
-        function addImageToList(image) {
-            $('<li class="thumbnail"><img src="' + image.data + '" title="' + image.filename + '" /><p>' + image.filename + '<p/></li>')
-                .appendTo("#images ul");
-        }
+            Image.prototype.removeArea = function (area) {
+                var index = this.areas.indexOf(area);
+                if (index != -1) {
+                    this.areas.splice(index, 1);
+                }
+            };
 
+            function Area() {
+                this.points = new Array();
+            }
 
-        $("#fileOpenDialog").change(function (e) {
-            var files = e.target.files; // FileList object
+            var TagHipster = window.TagHipster = function ($openDialog, $imagePanel, $board, $toolbar, $areaList) {
+                this.$openDialog = $openDialog;
+                this.$imagePanel = $imagePanel;
+                this.$board = $board;
+                this.$toolbar = $toolbar;
+                this.$areaList = $areaList;
 
-            // Loop through the FileList and render image files as thumbnails.
-            for (var i = 0, file; file = files[i]; i++) {
+                var images = new Array();
 
-                // Only process image files.
-                if (!file.type.match('image.*')) {
-                    continue;
+                function addImage(filename, src) {
+                    var image = new Image(filename, src);
+                    images.push(image);
+                    $('<li class="thumbnail"><img src="' + image.src + '" title="' + image.name + '" /><p>' + image.name + '<p/></li>')
+                        .appendTo("#images ul")
+                        .data("image", image);
+
+                    if (images.length == 1) {
+                        selectImage(image);
+                    }
                 }
 
-                var reader = new FileReader();
+                function selectImage(image) {
+                    $("#board img").attr("src", image.src);
+                    $areaList.empty();
+                    for (var area in image.areas) {
+                        var areaMarkup = $('<div><h2>Some area</h2><ul></ul></div>');
+                        var list = areaMarkup.find("ul");
+                        list.append("<li>Point</li>");
+                        $areaList.append(areaMarkup);
+                    }
+                }
 
-                // Closure to capture the file information.
-                reader.onload = (function (theFile) {
-                    return function (e) {
-                        var image = {
-                            filename: theFile.name,
-                            data: e.target.result
+                $imagePanel.find("li:first").click(function () {
+                    $("#fileOpenDialog").click();
+                });
+
+                $("#images li.thumbnail").live("click", function () {
+                    var image = $(this).data("image");
+                    selectImage(image);
+                    return false;
+                });
+
+                $openDialog.change(function (e) {
+                    var files = e.target.files; // FileList object
+
+                    // Loop through the FileList and render image files as thumbnails.
+                    for (var i = 0, file; file = files[i]; i++) {
+
+                        // Only process image files.
+                        if (!file.type.match('image.*')) {
+                            continue;
                         }
 
-                        images.push(image);
-                        addImageToList(image);
-                    };
-                })(file);
+                        var reader = new FileReader();
 
-                // Read in the image file as a data URL.
-                reader.readAsDataURL(file);
+                        // Closure to capture the file information.
+                        reader.onload = (function (theFile) {
+                            return function (e) {
+                                addImage(theFile.name, e.target.result);
+                            };
+                        })(file);
+
+                        // Read in the image file as a data URL.
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                addImage("test", "Samples/IMG_3104.JPG");
             }
-        });
+
+
+        })(jQuery);
+
+        var app = new TagHipster($("#fileOpenDialog"), $("#images"), $("#board"), $("#toolbar"), $("#areas"));
 
         function writeOnCanvas(ctx, str, x, y) {
             ctx.font = '18px calibri';
