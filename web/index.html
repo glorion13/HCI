@@ -200,6 +200,28 @@
 	<![endif]-->
     <script>
         (function ($) {
+            function Dictionary() {
+                this.keys = new Array();
+                this.values = new Array();
+            }
+
+            Dictionary.prototype.push = function(key, value) {
+                this.keys.push(key);
+                this.values.push(value);
+            }
+
+            Dictionary.prototype.get = function (key) {
+                var index = this.keys.indexOf(key);
+                if (index > -1) {
+                    return this.values[index];
+                }
+            }
+
+            Dictionary.prototype.clear = function () {
+                this.keys.length = 0;
+                this.values.length = 0;
+            }
+
             function distance(a, b) {
                 return Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
             }
@@ -262,10 +284,10 @@
                 var images = [];
                 var currentImage;
                 var currentArea;
-                var canvases = [];
+                var canvases = new Dictionary();
 
                 function clearBoard() {
-                    canvases.length = 0;
+                    canvases.clear();
                     $board.find("canvas").remove();
                 }
 
@@ -279,6 +301,18 @@
                     if (images.length == 1) {
                         selectImage(image);
                     }
+                }
+
+                function createCanvas(area) {
+                    var imageTag = $board.find("img");
+
+                    var canvas = $('<canvas />');
+                    canvas[0].height = imageTag.height();
+                    canvas[0].width = imageTag.width();
+                    canvas.appendTo($board);
+                    canvases.push(area, canvas);
+
+                    return area;
                 }
 
                 function selectImage(image) {
@@ -298,11 +332,7 @@
                         $areaList.append(areaMarkup);
                         areaMarkup.data("area", area);
 
-                        var canvas = $('<canvas />');
-                        canvas[0].height = imageTag.height();
-                        canvas[0].width = imageTag.width();
-                        canvas.appendTo($board);
-                        canvases[area] = canvas;
+                        createCanvas(area);
                         repaintArea(area);
                     }
 
@@ -364,7 +394,7 @@
                 }
 
                 function repaintArea(area) {
-                    var canvas = canvases[area];
+                    var canvas = canvases.get(area);
                     if (!canvas) {
                         alert("canvas lost :(");
                     } else {
@@ -386,6 +416,16 @@
                     var image = $(this).data("image");
                     selectImage(image);
                     return false;
+                });
+
+                $toolbar.find(".add-region-button").click(function () {
+                    if (currentImage) {
+                        var area = currentImage.createArea();
+                        createCanvas(area);
+                        selectArea(area);
+                    } else {
+                        alert("Please open a picture to annotate first.");
+                    };
                 });
 
                 $openDialog.change(function (e) {
