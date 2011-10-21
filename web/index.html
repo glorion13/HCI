@@ -249,11 +249,11 @@
             Image.prototype.hasPoint = function (point, radius) {
                 for (var i = 0; i < this.areas.length; i++) {
                     var area = this.areas[i];
-                    var point = area.hasPoint(point, radius);
-                    if (point) {
+                    var p = area.hasPoint(point, radius);
+                    if (p) {
                         return { 
                             area: area,
-                            point: point
+                            point: p
                         };
                     }
                 }
