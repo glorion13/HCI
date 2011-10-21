@@ -119,9 +119,9 @@
             background: url(Images/open.png) no-repeat center 2px;
         }
         
-        .save-file-button
+        .load-area-button
         {
-            background: url(Images/save.png) no-repeat center 2px;
+            background: url(Images/load.png) no-repeat center 2px;
         }
 
         #boardWrapper
@@ -244,12 +244,21 @@
         <div id="toolbar">
             <div class="visuallyhidden">
                 <input type="file" id="fileOpenDialog" name="files[]" multiple />
+                <input type="file" id="openAreasDialog" name="files[]" multiple />
             </div>
 
             <div class="button open-file-button">
                 <div>
                     open new image
                 </div>
+            </div>
+
+            <div class="button add-region-button">
+                <div>new area</div>
+            </div>
+
+            <div class="button load-area-button">
+                <div>load areas</div>
             </div>
 
             <div class="button">
@@ -264,10 +273,6 @@
 		              </a>
 	                </object><iframe id="_sl_historyFrame" style="visibility:hidden;height:0px;width:0px;border:0px"></iframe>
                 </div>
-            </div>
-
-            <div class="button add-region-button">
-                <div>new region</div>
             </div>
 
             <div class="button help-button">
@@ -287,7 +292,7 @@
     <script src="Scripts/canvas2image.js" type="text/javascript"></script>
     <script>
         function getTextToSave() {
-            return "mlk!";
+            return app.exportAreas();
         }
 
         (function ($) {
@@ -355,13 +360,19 @@
                 return $(this).val();
             });
 
-            function Area() {
-                var index = Math.floor(Math.random() * colorList.length); 
-                var color = colorList[index];
-                
-                this.points = new Array();
-                this.closed = false;
-                this.color = '#' + color;
+            function Area(area) {
+                if (area) {
+                    this.points = area.points;
+                    this.closed = area.closed;
+                    this.color = area.color;
+                } else {
+                    var index = Math.floor(Math.random() * colorList.length);
+                    var color = colorList[index];
+
+                    this.points = new Array();
+                    this.closed = false;
+                    this.color = '#' + color;
+                }
             }
 
             Area.prototype.hasPoint = function (point, radius) {
@@ -373,17 +384,22 @@
                 return false;
             }
 
-            var TagHipster = window.TagHipster = function ($openDialog, $imagePanel, $board, $toolbar, $areaList) {
+            TagHipster = window.TagHipster = function ($openDialog, $openAreaDialog, $imagePanel, $board, $toolbar, $areaList) {
                 this.$openDialog = $openDialog;
                 this.$imagePanel = $imagePanel;
                 this.$board = $board;
                 this.$toolbar = $toolbar;
                 this.$areaList = $areaList;
+                this.$openAreaDialog = $openAreaDialog;
 
                 var images = [];
                 var currentImage;
                 var currentArea;
                 var canvases = new Dictionary();
+
+                this.exportAreas = function () {
+                    return JSON.stringify(currentImage.areas);
+                }
 
                 function clearUi() {
                     canvases.clear();
@@ -465,6 +481,13 @@
 
                 function selectArea(area) {
                     currentArea = area;
+                }
+
+                function addImportedArea(area) {
+                    currentImage.areas.push(area);
+                    createCanvas(area);
+                    createAreaEntry(area);
+                    repaintArea(area);
                 }
 
                 function createAndSelectArea() {
@@ -549,8 +572,12 @@
                     $openDialog.click();
                 });
 
-                $toolbar.find(".save-file-button").click(function () {
-                    
+                $toolbar.find(".load-area-button").click(function () {
+                    if (currentImage) {
+                        $openAreaDialog.click();
+                    } else {
+                        alert("Please open a picture to annotate first.");
+                    };
                 });
 
                 $toolbar.find(".add-region-button").click(function () {
@@ -584,6 +611,43 @@
                         // Read in the image file as a data URL.
                         reader.readAsDataURL(file);
                     }
+
+                    $openDialog.val(null);
+                });
+
+                function loadAreas(text) {
+                    var input = JSON.parse(text);
+                    for (var i = 0; i < input.length; i++) {
+                        var area = new Area(input[i]);
+                        addImportedArea(area);
+                    }
+                }
+
+                $openAreaDialog.change(function (e) {
+                    var files = e.target.files; // FileList object
+
+                    // Loop through the FileList and render image files as thumbnails.
+                    for (var i = 0, file; file = files[i]; i++) {
+
+                        // Only process image files.
+                        if (!file.type.match('text.*')) {
+                            continue;
+                        }
+
+                        var reader = new FileReader();
+
+                        // Closure to capture the file information.
+                        reader.onload = (function (theFile) {
+                            return function (e) {
+                                loadAreas(e.target.result);
+                            };
+                        })(file);
+
+                        // Read in the image file as a data URL.
+                        reader.readAsText(file);
+                    }
+
+                    $openAreaDialog.val('');
                 });
 
                 var mouseDown;
@@ -716,11 +780,9 @@
 
                 addImage("test", "Samples/IMG_3104.JPG");
             }
-
-
         })(jQuery);
 
-        var app = new TagHipster($("#fileOpenDialog"), $("#images"), $("#board"), $("#toolbar"), $("#areas"));
+        app = new TagHipster($("#fileOpenDialog"), $("#openAreasDialog"), $("#images"), $("#board"), $("#toolbar"), $("#areas"));
         /*
         function writeOnCanvas(ctx, str, x, y) {
             ctx.font = '18px calibri';
