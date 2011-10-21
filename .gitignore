@@ -1,3 +1,5 @@
 
 *.suo
 *.suo
+/sl/Downloader/Downloader/Bin
+/sl/Downloader/Downloader/obj
