@@ -52,9 +52,27 @@
             }
 
             #images li
-            {
-                display: inline-block;   
+            { 
                 vertical-align: top;
+            }
+            
+            #images li, .button
+            {
+                border-radius: 2px;  
+                border-width: 2px;
+                border-style: solid;
+                border-color: transparent;
+                 
+                cursor: pointer;     
+                margin: 3px 10px;
+                display: inline-block;  
+            }
+            
+            #images li:hover, .button:hover
+            {
+                /*border: 2px solid #ffd800; */
+                border: 2px solid #ebff3f; 
+                border-color: #ebff3f;     
             }
 
                 #images li.thumbnail
@@ -70,19 +88,6 @@
                     vertical-align: text-top;
                     margin-right: 10px;
                 }
-                
-            #images li, .button
-            {
-                border-radius: 2px;  
-                border: 2px solid #ffd800;     
-                cursor: pointer;     
-                margin: 3px 10px;
-            }
-            
-            #images li:hover, .button:hover
-            {
-                border-color: #ebff3f;     
-            }
         
         .button
         {
@@ -99,6 +104,11 @@
         .add-region-button
         {
             background: url(Images/add-region.png) no-repeat center 2px;
+        }
+        
+        .help-button
+        {
+            background: url(Images/help.png) no-repeat center 2px;
         }
         
         .open-file-button
@@ -133,10 +143,11 @@
 
         #areas
         {
-            width: 250px;
+            width: 230px;
             top: 100px;
             bottom: 900px;
             right: 0;
+            padding: 10px;
         }
 
         #toolbar
@@ -188,6 +199,10 @@
         <div id="toolbar">
             <div class="button add-region-button">
                 <div>new region</div>
+            </div>
+
+            <div class="button help-button">
+                <div>help</div>
             </div>
         </div>
     </div>
@@ -315,6 +330,18 @@
                     return area;
                 }
 
+                function createAreaEntry(area) {
+                    var areaMarkup = $('<div class="area"><h2>Some area</h2><ul></ul></div>');
+                    var list = areaMarkup.find("ul");
+                    for (var i = 0; i < area.points.length; i++) {
+                        var point = area.points[i];
+                        list.append('<li>point ' + i + ': (' + point.x + '; ' + point.y + ')</li>');
+                    }
+                    
+                    areaMarkup.hide().appendTo($areaList).slideDown();
+                    areaMarkup.data("area", area);
+                }
+
                 function selectImage(image) {
                     currentImage = image;
 
@@ -326,12 +353,7 @@
                     $areaList.empty();
                     for (var i = 0; i < image.areas.length; i++) {
                         var area = image.areas[i];
-                        var areaMarkup = $('<div class="area"><h2>Some area</h2><ul></ul></div>');
-                        var list = areaMarkup.find("ul");
-                        list.append("<li>Point</li>");
-                        $areaList.append(areaMarkup);
-                        areaMarkup.data("area", area);
-
+                        createAreaEntry(area);
                         createCanvas(area);
                         repaintArea(area);
                     }
@@ -347,6 +369,13 @@
                     currentArea = area;
                 }
 
+                function createAndSelectArea() {
+                    var area = currentImage.createArea();
+                    createCanvas(area);
+                    createAreaEntry(area);
+                    selectArea(area);
+                    return area;
+                }
 
                 function startArea(ctx, x, y) {
                     ctx.beginPath();
@@ -420,9 +449,7 @@
 
                 $toolbar.find(".add-region-button").click(function () {
                     if (currentImage) {
-                        var area = currentImage.createArea();
-                        createCanvas(area);
-                        selectArea(area);
+                        createAndSelectArea();
                     } else {
                         alert("Please open a picture to annotate first.");
                     };
@@ -555,8 +582,7 @@
                             switch (currentMode) {
                                 case Mode.Click:
                                     if (!currentArea) {
-                                        var area = currentImage.createArea();
-                                        selectArea(area);
+                                        createAndSelectArea();
                                     }
                                     currentArea.points.push(coords);
                                     repaintArea(currentArea);
