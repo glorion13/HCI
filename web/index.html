@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="Styles/style.css?v=2">
     <link rel="stylesheet" media="handheld" href="Styles/handheld.css?v=2">
     <script src="Scripts/modernizr-1.7.min.js" type="text/javascript"></script>
+    <script src="Scripts/Silverlight.js" type="text/javascript"></script>
+    <link href="Styles/jquery.colorpicker.css" rel="stylesheet" type="text/css" />
     <style>
         body, html
         {
@@ -66,6 +68,7 @@
                 cursor: pointer;     
                 margin: 3px 10px;
                 display: inline-block;  
+                vertical-align: top;
             }
             
             #images li:hover, .button:hover
@@ -92,7 +95,7 @@
         .button
         {
             height: 80px;
-            width: 100px;
+            width: 130px;
         }
         
         .button > div
@@ -114,6 +117,11 @@
         .open-file-button
         {
             background: url(Images/open.png) no-repeat center 2px;
+        }
+        
+        .load-area-button
+        {
+            background: url(Images/load.png) no-repeat center 2px;
         }
 
         #boardWrapper
@@ -160,29 +168,66 @@
             background: url(Images/shadow-bottom.png) #6b6b6b repeat-x top;
         }
 
-        #fileOpenDialog
+        #silverlightControlHost
         {
-            display: none;
+            padding: 0;
+            height: 80px;
+            width: 130px;
         }
     </style>
 </head>
 <body>
     <div id="ui">
         <div id="images">
-            <div class="">
-                <input type="file" id="fileOpenDialog" name="files[]" multiple /></div>
             <ul>
-                <li id="addImageButton" class="button open-file-button">
-                    <div>
-                        open new image
-                    </div>
-                </li>
+
             </ul>
         </div>
         <div id="areas">
-            <div>
+            <div class="hidden">
+                <select id="picker" class="picker">
+                    <option value="FFFFFF">FFFFFF</option>
+                    <option value="FFDFDF">FFDFDF</option>
+                    <option value="FFBFBF">FFBFBF</option>
+                    <option value="FF9F9F">FF9F9F</option>
+                    <option value="FF7F7F">FF7F7F</option>
+                    <option value="FF5F5F">FF5F5F</option>
+                    <option value="FF3F3F">FF3F3F</option>
+                    <option value="FF1F1F">FF1F1F</option>
+                    <option value="FF0000">FF0000</option>
+                    <option value="DF1F00">DF1F00</option>
+                    <option value="C33B00">C33B00</option>
+                    <option value="A75700">A75700</option>
+                    <option value="8B7300">8B7300</option>
+                    <option value="6F8F00">6F8F00</option>
+                    <option value="53AB00">53AB00</option>
+                    <option value="37C700">37C700</option>
+                    <option value="1BE300">1BE300</option>
+                    <option value="00FF00" selected="selected">00FF00</option>
+                    <option value="00DF1F">00DF1F</option>
+                    <option value="00C33B">00C33B</option>
+                    <option value="00A757">00A757</option>
+                    <option value="008B73">008B73</option>
+                    <option value="006F8F">006F8F</option>
+                    <option value="0053AB">0053AB</option>
+                    <option value="0037C7">0037C7</option>
+                    <option value="001BE3">001BE3</option>
+                    <option value="0000FF">0000FF</option>
+                    <option value="0000df">0000df</option>
+                    <option value="0000c3">0000c3</option>
+                    <option value="0000a7">0000a7</option>
+                    <option value="00008b">00008b</option>
+                    <option value="00006f">00006f</option>
+                    <option value="000053">000053</option>
+                    <option value="000037">000037</option>
+                    <option value="00001b">00001b</option>
+                    <option value="000000">000000</option>
+                </select>
+            </div>
+            <div class="area">
                 <h2>
-                    Area 1</h2>
+                    Area 1
+                </h2>
                 <ul>
                     <li>Point 1</li>
                     <li>Point 1</li>
@@ -197,8 +242,37 @@
             </div>
         </div>
         <div id="toolbar">
+            <div class="visuallyhidden">
+                <input type="file" id="fileOpenDialog" name="files[]" multiple />
+                <input type="file" id="openAreasDialog" name="files[]" multiple />
+            </div>
+
+            <div class="button open-file-button">
+                <div>
+                    open new image
+                </div>
+            </div>
+
             <div class="button add-region-button">
-                <div>new region</div>
+                <div>new area</div>
+            </div>
+
+            <div class="button load-area-button">
+                <div>load areas</div>
+            </div>
+
+            <div class="button">
+                <div id="silverlightControlHost">
+                    <object data="data:application/x-silverlight-2," type="application/x-silverlight-2" width="100%" height="100%">
+		              <param name="source" value="Scripts/Downloader.xap"/>
+		              <param name="background" value="white" />
+		              <param name="minRuntimeVersion" value="3.0.40818.0" />
+		              <param name="autoUpgrade" value="true" />
+		              <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=3.0.40818.0" style="text-decoration:none">
+ 			              <img src="http://go.microsoft.com/fwlink/?LinkId=161376" alt="Get Microsoft Silverlight" style="border-style:none"/>
+		              </a>
+	                </object><iframe id="_sl_historyFrame" style="visibility:hidden;height:0px;width:0px;border:0px"></iframe>
+                </div>
             </div>
 
             <div class="button help-button">
@@ -213,7 +287,14 @@
 	<script src="Scripts/dd_belatedpng.js"></script>
 	<script> DD_belatedPNG.fix('img, .png_bg');</script>
 	<![endif]-->
+    <script src="Scripts/jquery.colorpicker.js" type="text/javascript"></script>
+    <script src="Scripts/base64.js" type="text/javascript"></script>
+    <script src="Scripts/canvas2image.js" type="text/javascript"></script>
     <script>
+        function getTextToSave() {
+            return app.exportAreas();
+        }
+
         (function ($) {
             function Dictionary() {
                 this.keys = new Array();
@@ -275,9 +356,23 @@
                 return false;
             }
 
-            function Area() {
-                this.points = new Array();
-                this.closed = false;
+            var colorList = $("#picker").find("option").map(function () {
+                return $(this).val();
+            });
+
+            function Area(area) {
+                if (area) {
+                    this.points = area.points;
+                    this.closed = area.closed;
+                    this.color = area.color;
+                } else {
+                    var index = Math.floor(Math.random() * colorList.length);
+                    var color = colorList[index];
+
+                    this.points = new Array();
+                    this.closed = false;
+                    this.color = '#' + color;
+                }
             }
 
             Area.prototype.hasPoint = function (point, radius) {
@@ -289,21 +384,28 @@
                 return false;
             }
 
-            var TagHipster = window.TagHipster = function ($openDialog, $imagePanel, $board, $toolbar, $areaList) {
+            TagHipster = window.TagHipster = function ($openDialog, $openAreaDialog, $imagePanel, $board, $toolbar, $areaList) {
                 this.$openDialog = $openDialog;
                 this.$imagePanel = $imagePanel;
                 this.$board = $board;
                 this.$toolbar = $toolbar;
                 this.$areaList = $areaList;
+                this.$openAreaDialog = $openAreaDialog;
 
                 var images = [];
                 var currentImage;
                 var currentArea;
                 var canvases = new Dictionary();
 
-                function clearBoard() {
+                this.exportAreas = function () {
+                    return JSON.stringify(currentImage.areas);
+                }
+
+                function clearUi() {
                     canvases.clear();
                     $board.find("canvas").remove();
+                    $areaList.find(".area").remove();
+                    $board.find("img").attr("src", null);
                 }
 
                 function addImage(filename, src) {
@@ -331,26 +433,38 @@
                 }
 
                 function createAreaEntry(area) {
+                    var picker = $areaList.find("#picker").clone().removeAttr("id");
                     var areaMarkup = $('<div class="area"><h2>Some area</h2><ul></ul></div>');
+                    picker.insertAfter(areaMarkup.find("h2"));
                     var list = areaMarkup.find("ul");
                     for (var i = 0; i < area.points.length; i++) {
                         var point = area.points[i];
                         list.append('<li>point ' + i + ': (' + point.x + '; ' + point.y + ')</li>');
                     }
                     
-                    areaMarkup.hide().appendTo($areaList).slideDown();
+                    areaMarkup.hide().appendTo($areaList);
+                    picker.val(area.color.substr(1));
+                    picker.colorpicker({
+                        size: 20,
+                        label: 'Color: ',
+                        hide: true
+                    });
+                    picker.change(function () {
+                        area.color = '#' + picker.val()
+                        repaintArea(area);
+                    });
+                    areaMarkup.slideDown();
                     areaMarkup.data("area", area);
                 }
 
                 function selectImage(image) {
                     currentImage = image;
 
-                    clearBoard();
+                    clearUi();
 
                     var imageTag = $board.find("img");
                     imageTag.attr("src", image.src);
 
-                    $areaList.empty();
                     for (var i = 0; i < image.areas.length; i++) {
                         var area = image.areas[i];
                         createAreaEntry(area);
@@ -369,6 +483,13 @@
                     currentArea = area;
                 }
 
+                function addImportedArea(area) {
+                    currentImage.areas.push(area);
+                    createCanvas(area);
+                    createAreaEntry(area);
+                    repaintArea(area);
+                }
+
                 function createAndSelectArea() {
                     var area = currentImage.createArea();
                     createCanvas(area);
@@ -377,8 +498,11 @@
                     return area;
                 }
 
-                function startArea(ctx, x, y) {
+                function startArea(ctx, x, y, color) { 
                     ctx.beginPath();
+                    ctx.strokeStyle = color;
+                    ctx.fillStyle = color;
+                    ctx.lineWidth = 3;
                     ctx.moveTo(x, y);
                 }
 
@@ -391,16 +515,17 @@
                     canvas[0].width = canvas[0].width;
                 }
 
-                function drawPoint(ctx, x, y) {
+                function drawPoint(ctx, x, y, color) {
                     //start drawing
-                    ctx.beginPath();
+                    //ctx.beginPath();
                     ctx.moveTo(x, y);
                     //draw arc: arc(x, y, radius, startAngle, endAngle, anticlockwise)
                     ctx.arc(x, y, 5, Math.PI * 2, 0, true);
+                    ctx.fill();
                     //end drawing
                     ctx.moveTo(x, y);
-                    ctx.closePath();
-                    ctx.fill();
+                    //ctx.closePath();
+
                 }
 
                 function redrawCanvas(ctx, area) {
@@ -412,7 +537,7 @@
                             continueArea(ctx, area.points[i].x, area.points[i].y);
                         }
                         else {
-                            startArea(ctx, area.points[i].x, area.points[i].y);
+                            startArea(ctx, area.points[i].x, area.points[i].y, area.color);
                         }
                         drawPoint(ctx, area.points[i].x, area.points[i].y);
                     }
@@ -437,14 +562,22 @@
                     }
                 }
 
-                $imagePanel.find("li:first").click(function () {
-                    $("#fileOpenDialog").click();
-                });
-
-                $("#images li.thumbnail").live("click", function () {
+                $imagePanel.find("li").live("click", function () {
                     var image = $(this).data("image");
                     selectImage(image);
                     return false;
+                });
+
+                $toolbar.find(".open-file-button").click(function () {
+                    $openDialog.click();
+                });
+
+                $toolbar.find(".load-area-button").click(function () {
+                    if (currentImage) {
+                        $openAreaDialog.click();
+                    } else {
+                        alert("Please open a picture to annotate first.");
+                    };
                 });
 
                 $toolbar.find(".add-region-button").click(function () {
@@ -478,6 +611,43 @@
                         // Read in the image file as a data URL.
                         reader.readAsDataURL(file);
                     }
+
+                    $openDialog.val(null);
+                });
+
+                function loadAreas(text) {
+                    var input = JSON.parse(text);
+                    for (var i = 0; i < input.length; i++) {
+                        var area = new Area(input[i]);
+                        addImportedArea(area);
+                    }
+                }
+
+                $openAreaDialog.change(function (e) {
+                    var files = e.target.files; // FileList object
+
+                    // Loop through the FileList and render image files as thumbnails.
+                    for (var i = 0, file; file = files[i]; i++) {
+
+                        // Only process image files.
+                        if (!file.type.match('text.*')) {
+                            continue;
+                        }
+
+                        var reader = new FileReader();
+
+                        // Closure to capture the file information.
+                        reader.onload = (function (theFile) {
+                            return function (e) {
+                                loadAreas(e.target.result);
+                            };
+                        })(file);
+
+                        // Read in the image file as a data URL.
+                        reader.readAsText(file);
+                    }
+
+                    $openAreaDialog.val('');
                 });
 
                 var mouseDown;
@@ -590,6 +760,7 @@
                                 case Mode.CloseArea:
                                     currentArea.closed = true;
                                     repaintArea(currentArea);
+                                    currentArea = null;
                                     break;
 
                                 default:
@@ -609,11 +780,9 @@
 
                 addImage("test", "Samples/IMG_3104.JPG");
             }
-
-
         })(jQuery);
 
-        var app = new TagHipster($("#fileOpenDialog"), $("#images"), $("#board"), $("#toolbar"), $("#areas"));
+        app = new TagHipster($("#fileOpenDialog"), $("#openAreasDialog"), $("#images"), $("#board"), $("#toolbar"), $("#areas"));
         /*
         function writeOnCanvas(ctx, str, x, y) {
             ctx.font = '18px calibri';
